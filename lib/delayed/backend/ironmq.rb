@@ -20,9 +20,9 @@ module Delayed
 
         def initialize(data = {})
           puts "[init] Delayed::Backend::Ironmq"
-          @id = nil
+          @msg = nil
           if data.is_a?(IronMQ::Message)
-            @id = data.id
+            @mgs = data
             data = JSON.load(data.body)
           end
 
@@ -62,12 +62,12 @@ module Delayed
           end
           payload = JSON.dump(@attributes)
 
-          ironmq.messages.delete(@id, queue_name: queue_name) if @id.present?
-          ironmq.messages.post(payload,
-            timeout:    @timeout,
-            queue_name: queue_name,
-            delay:      @delay,
-            expires_in: @expires_in)
+          @msg.delete if @msg
+
+          ironmq.queue(queue_name).post(payload,
+                                        :timeout    => @timeout,
+                                        :delay      => @delay,
+                                        :expires_in => @expires_in)
           true
         end
 
@@ -76,9 +76,9 @@ module Delayed
         end
 
         def destroy
-          if @id
-            puts "job destroyed! #{@id.inspect}"
-            ironmq.messages.delete(@id, queue_name: queue_name) if @id.present?
+          if @msg
+            puts "job destroyed! #{@msg.id}"
+            @msg.delete
           end
         end
 
