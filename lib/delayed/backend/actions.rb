@@ -31,8 +31,8 @@ module Delayed
 
         def find_available(worker_name, limit = 5, max_run_time = Worker.max_run_time)
           Delayed::Worker.available_priorities.each do |priority|
-            messages = ironmq.messages.get(queue_name: queue_name(priority), n: 1)
-            return [Delayed::Backend::Ironmq::Job.new(messages[0])] if messages[0]
+            message = ironmq.queue(queue_name(priority)).get
+            return [Delayed::Backend::Ironmq::Job.new(message)] if message
           end
           []
         end
@@ -41,10 +41,10 @@ module Delayed
           deleted = 0
           Delayed::Worker.available_priorities.each do |priority|
             loop do
-              msgs = ironmq.messages.get(n: 1000, queue_name: queue_name(priority))
+              msgs = ironmq.queue(queue_name(priority)).get(:n => 1000)
               break if msgs.blank?
               msgs.each do |msg|
-                ironmq.messages.delete(msg.id, queue_name: queue_name(priority))
+                msg.delete
                 deleted += 1
               end
             end
