@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = "delayed_job_ironmq"
-  s.version = "0.1.5"
+  s.name = %q{delayed_job_ironmq}
+  s.version = "1.0.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Alexander Shapiotko", "Iron.io, Inc"]
-  s.date = "2013-03-22"
-  s.description = "IronMQ backend for delayed_job"
-  s.email = "info@iron.io"
+  s.date = %q{2013-03-22}
+  s.description = %q{IronMQ backend for delayed_job}
+  s.email = %q{info@iron.io}
   s.extra_rdoc_files = [
     "LICENSE",
     "README.md"
@@ -29,12 +29,13 @@ Gem::Specification.new do |s|
     "lib/delayed_job_ironmq.rb",
     "spec/.gitkeep"
   ]
-  s.homepage = "https://github.com/thousandsofthem/delayed_job_ironmq"
+  s.homepage = %q{https://github.com/thousandsofthem/delayed_job_ironmq}
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.24"
-  s.summary = "IronMQ backend for delayed_job"
+  s.rubygems_version = %q{1.3.7}
+  s.summary = %q{IronMQ backend for delayed_job}
 
   if s.respond_to? :specification_version then
+    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
