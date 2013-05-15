@@ -1,5 +1,4 @@
 
-
 module Delayed
   module Backend
     module Ironmq
@@ -22,7 +21,7 @@ module Delayed
           puts "[init] Delayed::Backend::Ironmq"
           @msg = nil
           if data.is_a?(IronMQ::Message)
-            @mgs = data
+            @msg = data
             data = JSON.load(data.body)
           end
 
