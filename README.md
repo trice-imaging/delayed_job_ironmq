@@ -27,7 +27,7 @@ Optionally: Add an initializer (`config/initializers/delayed_job.rb`):
 ```ruby
 Delayed::Worker.configure do |config|
   # optional params:
-  config.available_priorities = [-1,0,1,2] # Default is [0]. Please note, each new priority will speed down a bit picking job from queue
+  config.available_priorities = [-1,0,1,2] # Default is [0]. Please note, adding new priorities will slow down picking the next job from queue.  Also note that these priorities must include all priorities of your Delayed Jobs.
   config.queue_name = 'default' # Specify an alternative queue name
   config.delay = 0  # Time to wait before message will be available on the queue
   config.timeout = 5.minutes # The time in seconds to wait after message is taken off the queue, before it is put back on. Delete before :timeout to ensure it does not go back on the queue.
