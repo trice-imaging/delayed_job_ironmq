@@ -49,7 +49,6 @@ module Delayed
               end
             end
           end
-          puts "Messages removed: #{deleted}"
         end
 
         # No need to check locks
