@@ -18,7 +18,6 @@ module Delayed
         field :queue,       :type => String
 
         def initialize(data = {})
-          puts "[init] Delayed::Backend::Ironmq"
           @msg = nil
           if data.is_a?(IronMQ::Message)
             @msg = data
@@ -54,8 +53,6 @@ module Delayed
         end
 
         def save
-          puts "[SAVE] #{@attributes.inspect}"
-
           if @attributes[:handler].blank?
             raise "Handler missing!"
           end
@@ -76,7 +73,6 @@ module Delayed
 
         def destroy
           if @msg
-            puts "job destroyed! #{@msg.id}"
             @msg.delete
           end
         end
