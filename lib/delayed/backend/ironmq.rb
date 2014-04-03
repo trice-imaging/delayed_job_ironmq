@@ -103,6 +103,10 @@ module Delayed
           super
         end
 
+        def id
+          @msg.id if @msg
+        end
+
         private
 
         def queue_name
