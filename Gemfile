@@ -1,9 +1,3 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
-gem 'iron_mq', '>= 4.0.0'
-gem 'delayed_job',  '~> 3.0.0'
-
-group :development do
-  gem 'rspec', '>= 2.0'
-  gem 'jeweler2'
-end
+gemspec

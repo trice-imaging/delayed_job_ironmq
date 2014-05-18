@@ -1,11 +1,7 @@
 module Delayed
   module Backend
     module Ironmq
-      @@version = nil
-
-      def self.version
-        @@version ||= File.read(File.dirname(__FILE__) + '/../../../VERSION').strip
-      end
+      VERSION = "1.0.2"
     end
   end
 end
