@@ -36,7 +36,7 @@ module Delayed
         end
 
         def payload_object
-          @payload_object ||= YAML.load(self.handler)
+          @payload_object ||= yaml_load
         rescue TypeError, LoadError, NameError, ArgumentError => e
           raise DeserializationError,
             "Job failed to load: #{e.message}. Handler: #{handler.inspect}"
@@ -44,7 +44,7 @@ module Delayed
 
         def payload_object=(object)
           if object.is_a? String
-            @payload_object = YAML.load(object)
+            @payload_object = yaml_load(object)
             self.handler = object
           else
             @payload_object = object
@@ -115,6 +115,11 @@ module Delayed
 
         def ironmq
           ::Delayed::Worker.ironmq
+        end
+
+        def yaml_load(object)
+          object ||= self.handler
+          YAML.respond_to?(:load_dj) ? YAML.load_dj(object) : YAML.load(object)
         end
       end
     end
