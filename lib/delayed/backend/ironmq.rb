@@ -36,7 +36,7 @@ module Delayed
         end
 
         def payload_object
-          @payload_object ||= yaml_load(object)
+          @payload_object ||= yaml_load
         rescue TypeError, LoadError, NameError, ArgumentError => e
           raise DeserializationError,
             "Job failed to load: #{e.message}. Handler: #{handler.inspect}"
@@ -118,7 +118,8 @@ module Delayed
         end
 
         def yaml_load(object)
-           YAML.respond_to?(:load_dj) ? YAML.load_dj(object) : YAML.load(object)
+          object ||= self.handler
+          YAML.respond_to?(:load_dj) ? YAML.load_dj(object) : YAML.load(object)
         end
       end
     end
