@@ -31,6 +31,7 @@ module Delayed
 
         def find_available(worker_name, limit = 5, max_run_time = Worker.max_run_time)
           Delayed::Worker.available_priorities.each do |priority|
+            message = nil
             begin
               message = ironmq.queue(queue_name(priority)).get
             rescue Exception => e
@@ -45,6 +46,7 @@ module Delayed
           deleted = 0
           Delayed::Worker.available_priorities.each do |priority|
             loop do
+              msgs = nil
               begin
                 msgs = ironmq.queue(queue_name(priority)).get(:n => 1000)
               rescue Exception => e

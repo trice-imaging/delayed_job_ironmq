@@ -11,7 +11,18 @@ To start using delayed_job_ironmq, you need to sign up for Iron.io and setup you
 
 1. Go to http://iron.io/ and sign up.
 2. Get an Oauth Token at http://hud.iron.io/tokens
-3. Add an iron.json file or setup environment variables for authentication. See http://dev.iron.io/articles/configuration/ for details.
+3. Add an iron.json file or setup environment variables for authentication. See http://dev.iron.io/mq/reference/configuration/ for details.
+
+If you want to set the Host, Post, and Protocol specifically, simply include those keys in that project's iron.json file:
+```json
+{
+    "project_id": "PROJECT ID HERE",
+    "token": "YOUR TOKEN HERE"
+    "port":443,
+    "protocol": "https",
+    "host":"mq-v3-worker-1.iron.io"
+}
+```
 
 ## Installation
 
