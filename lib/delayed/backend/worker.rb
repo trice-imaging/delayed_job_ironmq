@@ -4,7 +4,7 @@ module Delayed
   class Worker
     class << self
       attr_accessor :config, :ironmq,
-                    :queue_name, :delay, :timeout, :expires_in, :available_priorities
+                    :queue_name, :delay, :timeout, :expires_in, :available_priorities, :logger
 
       def configure
         yield(config)
@@ -19,6 +19,9 @@ module Delayed
         else
           raise ArgumentError, "available_priorities option has wrong format. Please provide array of Integer values, includes zero. Default is [0]."
         end
+
+        self.logger = Logger.new(STDOUT)
+        self.logger.level = Logger::WARN
       end
 
       def config

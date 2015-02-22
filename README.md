@@ -18,8 +18,8 @@ To start using delayed_job_ironmq, you need to sign up for Iron.io and setup you
 Add the gems to your `Gemfile:`
 
 ```ruby
-gem 'delayed_job'
-gem 'delayed_job_ironmq'
+gem 'delayed_job', '3.0.5'
+gem 'delayed_job_ironmq', '2.0.0.pre1'
 ```
 
 Optionally: Add an initializer (`config/initializers/delayed_job.rb`):
@@ -64,7 +64,7 @@ That will start pulling jobs off the queue and processing them.
 
 # Demo Rails Application
 
-Here's a demo rails app you can clone and try it out: https://github.com/treeder/delayed_job_with_iron_mq
+Here's a demo rails app you can clone and try it out: https://github.com/treeder/delayed_job_ironmq_example
 
 # Using with Heroku
 
