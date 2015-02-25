@@ -27,11 +27,12 @@ module Delayed
           data.symbolize_keys!
           payload_obj = data.delete(:payload_object) || data.delete(:handler)
 
-          @queue_name = data[:queue_name] || Delayed::Worker.queue_name
-          @delay      = data[:delay]      || Delayed::Worker.delay
-          @timeout    = data[:timeout]    || Delayed::Worker.timeout
-          @expires_in = data[:expires_in] || Delayed::Worker.expires_in
-          @attributes = data
+          @queue_name  = data[:queue_name]  || Delayed::Worker.queue_name
+          @delay       = data[:delay]       || Delayed::Worker.delay
+          @timeout     = data[:timeout]     || Delayed::Worker.timeout
+          @expires_in  = data[:expires_in]  || Delayed::Worker.expires_in
+          @error_queue = data[:error_queue] || Delayed::Worker.error_queue
+          @attributes  = data
           self.payload_object = payload_obj
         end
 
@@ -78,8 +79,10 @@ module Delayed
         end
 
         def fail!
-          destroy
-          # v2: move to separate queue
+          ironmq.queue(@error_queue).post(@msg.body,
+                                          :timeout    => @timeout,
+                                          :delay      => @delay,
+                                          :expires_in => @expires_in)
         end
 
         def update_attributes(attributes)
