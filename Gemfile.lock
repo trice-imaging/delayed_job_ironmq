@@ -3,7 +3,7 @@ PATH
   specs:
     delayed_job_ironmq (1.0.2)
       delayed_job (>= 3.0.0)
-      iron_mq (>= 4.0.0)
+      iron_mq (= 6.0.0.pre1)
 
 GEM
   remote: https://rubygems.org/
@@ -15,18 +15,16 @@ GEM
       activesupport (~> 3.0)
     diff-lcs (1.2.5)
     i18n (0.6.9)
-    iron_core (1.0.3)
+    iron_core (1.0.5)
       rest (>= 2.6.4)
-    iron_mq (5.0.1)
+    iron_mq (6.0.0.pre1)
       iron_core (>= 0.5.1)
     multi_json (1.10.0)
     net-http-persistent (2.9.4)
-    netrc (0.7.7)
-    rest (2.7.1)
+    netrc (0.10.2)
+    rest (3.0.3)
       net-http-persistent (>= 2.9.1)
-      rest_client (>= 1.7.1)
-    rest_client (1.7.3)
-      netrc (~> 0.7.7)
+      netrc
     rspec (2.14.1)
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)

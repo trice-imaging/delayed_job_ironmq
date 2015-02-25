@@ -11,15 +11,26 @@ To start using delayed_job_ironmq, you need to sign up for Iron.io and setup you
 
 1. Go to http://iron.io/ and sign up.
 2. Get an Oauth Token at http://hud.iron.io/tokens
-3. Add an iron.json file or setup environment variables for authentication. See http://dev.iron.io/articles/configuration/ for details.
+3. Add an iron.json file or setup environment variables for authentication. See http://dev.iron.io/mq/reference/configuration/ for details.
+
+If you want to set the Host, Post, and Protocol specifically, simply include those keys in that project's iron.json file:
+```json
+{
+    "project_id": "PROJECT ID HERE",
+    "token": "YOUR TOKEN HERE"
+    "port": 443,
+    "protocol": "https",
+    "host":"mq-v3-worker-1.iron.io"
+}
+```
 
 ## Installation
 
 Add the gems to your `Gemfile:`
 
 ```ruby
-gem 'delayed_job'
-gem 'delayed_job_ironmq'
+gem 'delayed_job', '3.0.5'
+gem 'delayed_job_ironmq', '2.0.0.pre1'
 ```
 
 Optionally: Add an initializer (`config/initializers/delayed_job.rb`):
@@ -32,8 +43,10 @@ Delayed::Worker.configure do |config|
   config.delay = 0  # Time to wait before message will be available on the queue
   config.timeout = 5.minutes # The time in seconds to wait after message is taken off the queue, before it is put back on. Delete before :timeout to ensure it does not go back on the queue.
   config.expires_in = 7.days # After this time, message will be automatically removed from the queue.
+  config.error_queue = 'error_queue' # The failed jobs will be placed into the error queue
 end
 ```
+If you want to keep failed jobs, set `Delayed::Worker.destroy_failed_jobs = false`. The failed jobs will be placed into the error queue if failures exceed `Worker.max_attempts`.
 
 ## Usage
 
@@ -64,7 +77,7 @@ That will start pulling jobs off the queue and processing them.
 
 # Demo Rails Application
 
-Here's a demo rails app you can clone and try it out: https://github.com/treeder/delayed_job_with_iron_mq
+Here's a demo rails app you can clone and try it out: https://github.com/treeder/delayed_job_ironmq_example
 
 # Using with Heroku
 
