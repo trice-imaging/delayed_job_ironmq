@@ -30,7 +30,7 @@ module Delayed
         #end
 
         def ready_to_run?(message)
-          return if message.nil?
+          return false if message.nil?
           job = JSON.parse(message.body, symbolize_names: true)
           if job.has_key?(:run_at) && !job[:run_at].nil?
             run_at = Time.parse(job[:run_at])
