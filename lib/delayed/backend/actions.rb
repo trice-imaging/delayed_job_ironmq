@@ -29,6 +29,17 @@ module Delayed
         #  Delayed::Worker.queue_name
         #end
 
+        def ready_to_run?(message)
+          return if message.nil?
+          job = JSON.parse(message.body, symbolize_names: true)
+          if job.has_key?(:run_at) && !job[:run_at].nil?
+            run_at = Time.parse(job[:run_at])
+            return run_at <= db_time_now
+          end
+
+          true
+        end
+
         def find_available(worker_name, limit = 5, max_run_time = Worker.max_run_time)
           Delayed::Worker.available_priorities.each do |priority|
             message = nil
@@ -37,7 +48,9 @@ module Delayed
             rescue Exception => e
               Delayed::Worker.logger.warn(e.message)
             end
-            return [Delayed::Backend::Ironmq::Job.new(message)] if message
+            if ready_to_run?(message)
+              return [Delayed::Backend::Ironmq::Job.new(message)]
+            end
           end
           []
         end
