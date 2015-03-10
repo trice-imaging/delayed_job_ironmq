@@ -29,7 +29,7 @@ If you want to set the Host, Post, and Protocol specifically, simply include tho
 Add the gems to your `Gemfile:`
 
 ```ruby
-gem 'delayed_job', '3.0.5'
+gem 'delayed_job', '~> 4.0.6'
 gem 'delayed_job_ironmq', '2.0.0.pre1'
 ```
 
@@ -67,6 +67,27 @@ Then in one of your controllers:
 ```ruby
 user = User.new
 user.delay.background_stuff
+```
+
+Or declare a job using activejob like so:
+
+```ruby
+class MyJob < ActiveJob::Base
+  queue_as :default
+  def perform(*args)
+    puts "I run in the background"
+  end
+end
+```
+
+Then enqueue a job:
+
+```ruby
+MyJob.perform_later record  # Enqueue a job to be performed as soon the queueing system is free.
+```
+
+```ruby
+MyJob.set(wait: 1.week).perform_later(record) # Enqueue a job to be performed 1 week from now.
 ```
 
 ## Start worker process
