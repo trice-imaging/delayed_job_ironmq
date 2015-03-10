@@ -20,7 +20,7 @@ If you want to set the Host, Post, and Protocol specifically, simply include tho
     "token": "YOUR TOKEN HERE"
     "port": 443,
     "protocol": "https",
-    "host":"mq-v3-worker-1.iron.io"
+    "host":"mq-v3-aws-us-east-1.iron.io"
 }
 ```
 
