@@ -59,6 +59,10 @@ module Delayed
           end
           payload = JSON.dump(@attributes)
 
+          if run_at && run_at.utc >= self.class.db_time_now
+            @delay = (run_at.utc - self.class.db_time_now).round
+          end
+
           @msg.delete if @msg
 
           ironmq.queue(queue_name).post(payload,
@@ -83,6 +87,7 @@ module Delayed
                                           :timeout    => @timeout,
                                           :delay      => @delay,
                                           :expires_in => @expires_in)
+          destroy
         end
 
         def update_attributes(attributes)
