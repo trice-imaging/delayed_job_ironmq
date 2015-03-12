@@ -18,7 +18,7 @@ Gem::Specification.new do |gem|
   gem.required_rubygems_version = ">= 1.3.6"
   gem.required_ruby_version = Gem::Requirement.new(">= 1.8")
   gem.add_runtime_dependency "iron_mq", "6.0.0.pre1"
-  gem.add_runtime_dependency "delayed_job", ">= 3.0.0"
+  gem.add_runtime_dependency "delayed_job", "~> 4.0.6"
 
   gem.add_development_dependency "rspec"
 end

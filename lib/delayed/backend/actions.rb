@@ -43,21 +43,18 @@ module Delayed
         end
 
         def delete_all
-          deleted = 0
           Delayed::Worker.available_priorities.each do |priority|
             loop do
               msgs = nil
+              queue = queue_name(priority)
               begin
-                msgs = ironmq.queue(queue_name(priority)).get(:n => 1000)
+                msgs = ironmq.queue(queue).get(:n => 1000)
               rescue Exception => e
                 Delayed::Worker.logger.warn(e.message)
               end
 
               break if msgs.blank?
-              msgs.each do |msg|
-                msg.delete
-                deleted += 1
-              end
+              ironmq.queue(queue).delete_reserved_messages(msgs)
             end
           end
         end
