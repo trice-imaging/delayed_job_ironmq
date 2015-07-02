@@ -62,6 +62,18 @@ user.delay.background_stuff
 
 That will start pulling jobs off the queue and processing them.
 
+## Compatibility with delayed_job 4.0.4 and higher
+
+If you are using the last versions of delayed_job gem you can see the following error while running the above example :
+```ruby
+Error while reserving job: undefined class/module User
+```
+
+To fix it move the user.rb file to lib/tasks/user.rake (user.rb should be renamed to user.rake) or add the path to user.rb in Rakefile:
+```ruby
+require File.expand_path('path_to_user.rb', __FILE__)
+```
+
 # Demo Rails Application
 
 Here's a demo rails app you can clone and try it out: https://github.com/treeder/delayed_job_with_iron_mq
