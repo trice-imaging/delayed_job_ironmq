@@ -16,6 +16,7 @@ module Delayed
         field :failed_at,   :type => Time
         field :last_error,  :type => String
         field :queue,       :type => String
+        field :created_at   :type => Time
 
         def initialize(data = {})
           @msg = nil
