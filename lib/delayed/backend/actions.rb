@@ -52,7 +52,7 @@ module Delayed
               Delayed::IronMqBackend.queues.each do |queue_item|
                 queue = queue_name(queue_item, priority)
                 begin
-                  msgs = ironmq.queue(queue).get(:n => 1000)
+                  msgs = ironmq.queue(queue).get(:n => 100)
                 rescue Exception => e
                   Delayed::IronMqBackend.logger.warn(e.message)
                 end
