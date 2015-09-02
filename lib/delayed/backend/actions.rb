@@ -31,13 +31,13 @@ module Delayed
 
         def find_available(worker_name, limit = 5, max_run_time = Worker.max_run_time)
           Delayed::IronMqBackend.available_priorities.each do |priority|
-            Delayed::IronMqBackend.queues.each do |queue_item|
+            Delayed::IronMqBackend.all_queues.each do |queue_item|
               message = nil
               queue = queue_name(queue_item, priority)
               begin
                 message = ironmq.queue(queue).get
               rescue Exception => e
-                Delayed::IronMqBackend.logger.warn(e.message)
+                Delayed::IronMqBackend.logger.info(e.message)
               end
               return [Delayed::Backend::Ironmq::Job.new(message)] if message
             end
