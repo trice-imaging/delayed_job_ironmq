@@ -30,31 +30,37 @@ module Delayed
         #end
 
         def find_available(worker_name, limit = 5, max_run_time = Worker.max_run_time)
-          Delayed::Worker.available_priorities.each do |priority|
-            message = nil
-            begin
-              message = ironmq.queue(queue_name(priority)).get
-            rescue Exception => e
-              Delayed::Worker.logger.warn(e.message)
+          Delayed::IronMqBackend.available_priorities.each do |priority|
+            Delayed::IronMqBackend.all_queues.each do |queue_item|
+              message = nil
+              queue = queue_name(queue_item, priority)
+              begin
+                message = ironmq.queue(queue).get
+              rescue Exception => e
+                Delayed::IronMqBackend.logger.info(e.message)
+              end
+              return [Delayed::Backend::Ironmq::Job.new(message)] if message
             end
-            return [Delayed::Backend::Ironmq::Job.new(message)] if message
           end
           []
         end
 
         def delete_all
-          Delayed::Worker.available_priorities.each do |priority|
+          Delayed::IronMqBackend.available_priorities.each do |priority|
             loop do
               msgs = nil
-              queue = queue_name(priority)
-              begin
-                msgs = ironmq.queue(queue).get(:n => 1000)
-              rescue Exception => e
-                Delayed::Worker.logger.warn(e.message)
+              Delayed::IronMqBackend.queues.each do |queue_item|
+                queue = queue_name(queue_item, priority)
+                begin
+                  msgs = ironmq.queue(queue).get(:n => 100)
+                rescue Exception => e
+                  Delayed::IronMqBackend.logger.warn(e.message)
+                end
+
+                break if msgs.blank?
+                ironmq.queue(queue).delete_reserved_messages(msgs)
               end
 
-              break if msgs.blank?
-              ironmq.queue(queue).delete_reserved_messages(msgs)
             end
           end
         end
@@ -67,11 +73,11 @@ module Delayed
         private
 
         def ironmq
-          ::Delayed::Worker.ironmq
+          ::Delayed::IronMqBackend.ironmq
         end
 
-        def queue_name(priority)
-          "#{Delayed::Worker.queue_name}_#{priority || 0}"
+        def queue_name(queue, priority)
+          "#{queue}_#{priority || 0}"
         end
       end
     end

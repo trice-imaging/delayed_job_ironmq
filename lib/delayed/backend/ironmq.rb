@@ -1,4 +1,3 @@
-
 module Delayed
   module Backend
     module Ironmq
@@ -28,12 +27,12 @@ module Delayed
           data.symbolize_keys!
           payload_obj = data.delete(:payload_object) || data.delete(:handler)
 
-          @queue_name  = data[:queue_name]  || Delayed::Worker.queue_name
-          @delay       = data[:delay]       || Delayed::Worker.delay
-          @timeout     = data[:timeout]     || Delayed::Worker.timeout
-          @expires_in  = data[:expires_in]  || Delayed::Worker.expires_in
-          @error_queue = data[:error_queue] || Delayed::Worker.error_queue
-          @attributes  = data
+          @default_queue = data[:default_queue]  || Delayed::IronMqBackend.default_queue
+          @delay         = data[:delay]          || Delayed::IronMqBackend.delay
+          @timeout       = data[:timeout]        || Delayed::IronMqBackend.timeout
+          @expires_in    = data[:expires_in]     || Delayed::IronMqBackend.expires_in
+          @error_queue   = data[:error_queue]    || Delayed::IronMqBackend.error_queue
+          @attributes    = data
           self.payload_object = payload_obj
         end
 
@@ -119,11 +118,11 @@ module Delayed
         private
 
         def queue_name
-          "#{@queue_name}_#{@attributes[:priority] || 0}"
+          "#{@attributes[:queue] || @default_queue}_#{@attributes[:priority] || 0}"
         end
 
         def ironmq
-          ::Delayed::Worker.ironmq
+          ::Delayed::IronMqBackend.ironmq
         end
 
         def yaml_load(object)
