@@ -36,8 +36,12 @@ module Delayed
               queue = queue_name(queue_item, priority)
               begin
                 message = ironmq.queue(queue).get
-              rescue Exception => e
-                Delayed::IronMqBackend.logger.info(e.message)
+              rescue StandardError => e
+                if e.is_a?(Rest::HttpError) && e.code == 404
+                  # supress Not Found errors
+                else
+                  Delayed::IronMqBackend.logger.info(e.message)
+                end
               end
               return [Delayed::Backend::Ironmq::Job.new(message)] if message
             end
@@ -53,8 +57,12 @@ module Delayed
                 queue = queue_name(queue_item, priority)
                 begin
                   msgs = ironmq.queue(queue).get(:n => 100)
-                rescue Exception => e
-                  Delayed::IronMqBackend.logger.warn(e.message)
+                rescue StandardError => e
+                  if e.is_a?(Rest::HttpError) && e.code == 404
+                    # supress Not Found errors
+                  else
+                    Delayed::IronMqBackend.logger.warn(e.message)
+                  end
                 end
 
                 break if msgs.blank?
