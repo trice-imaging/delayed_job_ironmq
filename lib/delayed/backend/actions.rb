@@ -38,9 +38,9 @@ module Delayed
                 message = ironmq.queue(queue).get
               rescue StandardError => e
                 if e.is_a?(Rest::HttpError) && e.code == 404
-                  # supress Not Found errors
+                  # suppress Not Found errors
                 else
-                  Delayed::IronMqBackend.logger.info(e.message)
+                  Delayed::IronMqBackend.logger.warn(e.message)
                 end
               end
               return [Delayed::Backend::Ironmq::Job.new(message)] if message
@@ -59,7 +59,7 @@ module Delayed
                   msgs = ironmq.queue(queue).get(:n => 100)
                 rescue StandardError => e
                   if e.is_a?(Rest::HttpError) && e.code == 404
-                    # supress Not Found errors
+                    # suppress Not Found errors
                   else
                     Delayed::IronMqBackend.logger.warn(e.message)
                   end
