@@ -12,7 +12,7 @@ module Delayed
         self.timeout       ||= 5.minutes
         self.expires_in    ||= 7.days
         self.error_queue   ||= 'error_queue'
-        self.queues        ||= [@default_queue]
+        self.queues        ||= []
 
         priorities =  self.available_priorities || [0]
         if priorities.include?(0) && priorities.all? { |p| p.is_a?(Integer) }
@@ -26,7 +26,7 @@ module Delayed
       end
 
       def all_queues
-        @queues | [@default_queue]
+        @queues.length > 0 ? @queues : [@default_queue]
       end
     end
   end
