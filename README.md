@@ -39,6 +39,7 @@ Optionally: Add an initializer (`config/initializers/delayed_job.rb`):
 Delayed::IronMqBackend.available_priorities = [-1,0,1,2] # Default is [0]. Please note, adding new priorities will slow down picking the next job from queue.  Also note that these priorities must include all priorities of your Delayed Jobs.
 Delayed::IronMqBackend.delay = 0  # Time to wait before message will be available on the queue
 Delayed::IronMqBackend.timeout = 5.minutes # The time in seconds to wait after message is taken off the queue, before it is put back on. Delete before :timeout to ensure it does not go back on the queue.
+Delayed::IronMqBackend.timeout_retries = 3 # The number of retries after timeout error
 Delayed::IronMqBackend.expires_in = 7.days # After this time, message will be automatically removed from the queue.
 Delayed::IronMqBackend.error_queue = 'error_queue' # The failed jobs will be placed into the error queue
 Delayed::IronMqBackend.default_queue = 'default' # Specify a default queue name
