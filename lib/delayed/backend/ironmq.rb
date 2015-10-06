@@ -27,12 +27,11 @@ module Delayed
           data.symbolize_keys!
           payload_obj = data.delete(:payload_object) || data.delete(:handler)
 
-          @default_queue   = data[:default_queue]   || Delayed::IronMqBackend.default_queue
-          @delay           = data[:delay]           || Delayed::IronMqBackend.delay
-          @timeout         = data[:timeout]         || Delayed::IronMqBackend.timeout
-          @expires_in      = data[:expires_in]      || Delayed::IronMqBackend.expires_in
-          @error_queue     = data[:error_queue]     || Delayed::IronMqBackend.error_queue
-          @timeout_retries = data[:timeout_retries] || Delayed::IronMqBackend.timeout_retries
+          @default_queue   = data[:default_queue]   || IronMqBackend.default_queue
+          @delay           = data[:delay]           || IronMqBackend.delay
+          @expires_in      = data[:expires_in]      || IronMqBackend.expires_in
+          @error_queue     = data[:error_queue]     || IronMqBackend.error_queue
+          @max_run_time    = data[:max_run_time]    || Worker.max_run_time
           @attributes    = data
           self.payload_object = payload_obj
 
@@ -76,15 +75,12 @@ module Delayed
           save
         end
 
+        # find better way to remove a timed out message
         def destroy
-          if @msg && @msg.reserved_count > @timeout_retries
-             @msg = ironmq.queue(queue_name).get_message(@msg.id)
-             fail!
-          else
-            @msg.delete
-          end
+          @msg.delete
         rescue
-          nil
+          @msg = ironmq.queue(queue_name).get_message(@msg.id)
+          @msg.delete
         end
 
         def fail!
@@ -103,9 +99,9 @@ module Delayed
           true
         end
 
-        # No need to check locks
+        # Reget a message(job) after max_run_time(timeout) to delete
         def unlock(*args)
-          true
+          @msg = ironmq.queue(queue_name).get_message(@msg.id)
         end
 
         def reload(*args)
@@ -135,7 +131,7 @@ module Delayed
         def initialize_queue
           ironmq.queue(queue_name).info
         rescue
-          ironmq.create_queue(queue_name, message_timeout: @timeout,
+          ironmq.create_queue(queue_name, message_timeout: @max_run_time.to_i,
                                           message_expiration: @expires_in.to_i)
         end
       end
