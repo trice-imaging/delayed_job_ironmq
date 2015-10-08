@@ -101,7 +101,7 @@ module Delayed
           true
         end
 
-        # Reget a message(job) after max_run_time(timeout) to delete
+        # No need to check locks
         def unlock(*args)
         end
 
