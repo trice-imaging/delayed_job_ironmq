@@ -6,6 +6,8 @@ module Delayed
         include Delayed::Backend::Base
         extend  Delayed::Backend::Ironmq::Actions
 
+        EXTRA_MESSAGE_TIMEOUT = 5
+
         field :priority,    :type => Integer, :default => 0
         field :attempts,    :type => Integer, :default => 0
         field :handler,     :type => String
@@ -75,12 +77,12 @@ module Delayed
           save
         end
 
-        # find better way to remove a timed out message
         def destroy
-          @msg.delete
-        rescue
-          @msg = ironmq.queue(queue_name).get_message(@msg.id)
-          @msg.delete
+          @msg.delete if @msg
+        rescue StandardError => e # reget message and remove if timeouted
+          IronMqBackend.logger.warn(e.message)
+          msg = ironmq.queue(queue_name).get_message(@msg.id)
+          msg.delete
         end
 
         def fail!
@@ -101,7 +103,6 @@ module Delayed
 
         # Reget a message(job) after max_run_time(timeout) to delete
         def unlock(*args)
-          @msg = ironmq.queue(queue_name).get_message(@msg.id)
         end
 
         def reload(*args)
@@ -131,7 +132,7 @@ module Delayed
         def initialize_queue
           ironmq.queue(queue_name).info
         rescue
-          ironmq.create_queue(queue_name, message_timeout: @max_run_time.to_i,
+          ironmq.create_queue(queue_name, message_timeout: @max_run_time.to_i + EXTRA_MESSAGE_TIMEOUT,
                                           message_expiration: @expires_in.to_i)
         end
       end
