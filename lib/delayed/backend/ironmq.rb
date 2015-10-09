@@ -6,6 +6,8 @@ module Delayed
         include Delayed::Backend::Base
         extend  Delayed::Backend::Ironmq::Actions
 
+        EXTRA_MESSAGE_TIMEOUT = 5
+
         field :priority,    :type => Integer, :default => 0
         field :attempts,    :type => Integer, :default => 0
         field :handler,     :type => String
@@ -27,13 +29,15 @@ module Delayed
           data.symbolize_keys!
           payload_obj = data.delete(:payload_object) || data.delete(:handler)
 
-          @default_queue = data[:default_queue]  || Delayed::IronMqBackend.default_queue
-          @delay         = data[:delay]          || Delayed::IronMqBackend.delay
-          @timeout       = data[:timeout]        || Delayed::IronMqBackend.timeout
-          @expires_in    = data[:expires_in]     || Delayed::IronMqBackend.expires_in
-          @error_queue   = data[:error_queue]    || Delayed::IronMqBackend.error_queue
+          @default_queue   = data[:default_queue]   || IronMqBackend.default_queue
+          @delay           = data[:delay]           || IronMqBackend.delay
+          @expires_in      = data[:expires_in]      || IronMqBackend.expires_in
+          @error_queue     = data[:error_queue]     || IronMqBackend.error_queue
+          @max_run_time    = data[:max_run_time]    || Worker.max_run_time
           @attributes    = data
           self.payload_object = payload_obj
+
+          initialize_queue
         end
 
         def payload_object
@@ -65,10 +69,7 @@ module Delayed
 
           @msg.delete if @msg
 
-          ironmq.queue(queue_name).post(payload,
-                                        :timeout    => @timeout,
-                                        :delay      => @delay,
-                                        :expires_in => @expires_in)
+          ironmq.queue(queue_name).post(payload, delay: @delay)
           true
         end
 
@@ -77,16 +78,15 @@ module Delayed
         end
 
         def destroy
-          if @msg
-            @msg.delete
-          end
+          @msg.delete if @msg
+        rescue StandardError => e # reget message and remove if timeouted
+          IronMqBackend.logger.warn(e.message)
+          msg = ironmq.queue(queue_name).get_message(@msg.id)
+          msg.delete
         end
 
         def fail!
-          ironmq.queue(@error_queue).post(@msg.body,
-                                          :timeout    => @timeout,
-                                          :delay      => @delay,
-                                          :expires_in => @expires_in)
+          ironmq.queue(@error_queue).post(@msg.body, delay: @delay)
           destroy
         end
 
@@ -103,7 +103,6 @@ module Delayed
 
         # No need to check locks
         def unlock(*args)
-          true
         end
 
         def reload(*args)
@@ -128,6 +127,13 @@ module Delayed
         def yaml_load(object)
           object ||= self.handler
           YAML.respond_to?(:load_dj) ? YAML.load_dj(object) : YAML.load(object)
+        end
+
+        def initialize_queue
+          ironmq.queue(queue_name).info
+        rescue
+          ironmq.create_queue(queue_name, message_timeout: @max_run_time.to_i + EXTRA_MESSAGE_TIMEOUT,
+                                          message_expiration: @expires_in.to_i)
         end
       end
     end

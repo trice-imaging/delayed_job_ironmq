@@ -3,16 +3,15 @@ require_relative 'iron_mq_config'
 module Delayed
   class IronMqBackend
     class << self
-      attr_accessor :config, :ironmq, :default_queue, :delay, :timeout, :expires_in,
+      attr_accessor :config, :ironmq, :default_queue, :delay, :expires_in,
                     :available_priorities, :error_queue, :logger, :queues
 
       def configure
-        self.default_queue ||= 'default'
-        self.delay         ||= 0
-        self.timeout       ||= 5.minutes
-        self.expires_in    ||= 7.days
-        self.error_queue   ||= 'error_queue'
-        self.queues        ||= []
+        self.default_queue   ||= 'default'
+        self.delay           ||= 0
+        self.expires_in      ||= 7.days
+        self.error_queue     ||= 'error_queue'
+        self.queues          ||= []
 
         priorities =  self.available_priorities || [0]
         if priorities.include?(0) && priorities.all? { |p| p.is_a?(Integer) }
